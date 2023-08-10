@@ -21,53 +21,65 @@ ac = 0
 valores = {}
 
 #Funciones que ejecuta el programa
+
+#1- Carga de memoria hacia AC
 def load(register):
   global ac
   ac = register
   print("Acumulador es: " + str(ac))
 
+#2- Almacenar en memoria desde AC
 def save():
     global ac
     return ac
 
+#3- Suma: memoria + AC
 def sum(register):
   global ac
   ac = ac +register
   print("Acumulador es: " + str(ac))
 
+#4- Suma: memoria1 + memoria2 + AC
 def sum2(register1, register2):
   global ac
   ac = ac + register1 + register2
   print("Acumulador es: " + str(ac))
 
+#10- Suma: memoria 1 + memoria 2, almacena en memoria 1
 def sum3(register1, register2):
     return register1 + register2
 
+#5- Resta: AC - memoria1, almacena en AC
 def sub1(register):
   global ac
   ac = ac - register
   print("Acumulador es: " + str(ac))
 
+#6- Resta: AC - memoria1,  almacena en memoria2
 def sub2(register1):
   global ac
   return ac - register1
 
+#7- Multiplicación: memoria x AC, almacena en AC
 def mult(register1):
   global ac
   ac = ac * register1
   print("Acumulador es: " + str(ac))
 
+#11- Multiplicación: memoria 1 x AC, almacena en memoria 2
 def mult2(register1):
     global ac
     ac = ac * register1
     print("Acumulador es: " + str(ac))
-    
+
+#12- División: AC / memoria 1, almacena en AC 
 def div(register1):
   global ac
   ac = ac // register1
   print("Acumulador es: " + str(ac))
   return ac
 
+#13- División: AC / memoria 1, almacena en memoria 2
 def div2(register1): #dividir el acumulador entre el registro se almacena en el registro2
   global ac
   return ac // register1
@@ -79,7 +91,7 @@ def load_to_es(register):
     es[register] = ac
 
     
-  # lee el dato de E/S y lo almacena en AC
+# lee el dato de E/S y lo almacena en AC
 def load_from_es(es_direction):
     global ac
     ac = es[es_direction]
@@ -103,12 +115,17 @@ def load_es_variable():
     es[int(data[0])] = int(data[1],2)
   print(es)
   
+#-------Funciones de lectura y ejecucion de instrucciones-----------------
+
+#lee la instruccion y retorna la accion
 def read_action(instruction):
     return actions[instruction[0:4]]
 
+#lee la instruccion y retorna los registros
 def read_register(instruction):
     return  int(instruction[4:15], 2), int(instruction[15:26], 2)
 
+#ejecuta la accion
 def execute_action(action, register1, register2):
     valor1 = valores.get(register1)
     valor2 = valores.get(register2)
@@ -141,12 +158,14 @@ def execute_action(action, register1, register2):
           load_to_es(register1)
     pass
 
+#guarda el valor en el registro
 def write_register(register,valor): #guarda el valor en el registro
     if(register in valores.keys()):
         valores[register] = valor
 
     else: valores[int(register)] = int(valor,2)
 
+#convierte el numero a binario
 def convertToBinary(num):
     return bin(num).replace("0b", "")
 
@@ -175,11 +194,12 @@ for x in g:
     execute_action(accion, register1, register2)
 g.close()
 
-#guardar los datos en el archivo
+#guardar los datos en el archivo de datos asi como el de E/S
 h = open("./datos.txt", "w")
 for x in valores:
     h.write(str(x) + "/" + str(convertToBinary(valores[x])) + "\n")
 h.close()
+write_to_es_file()
 
 #leer los datos del archivo
 print("Acumulador finalizado: " + str(ac))
@@ -189,4 +209,4 @@ result = h.read()
 print(result)
 h.close()
 
-write_to_es_file()
+
