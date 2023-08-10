@@ -1,18 +1,7 @@
-actions = {
-    "0001": "load",
-    "0010": "save",
-    "0011": "sum1",
-    "0100": "sum2",
-    "0101": "sub1",
-    "0110": "sub2",
-    "0111": "mul",
-    "1000": "load2",
-    "1001": "save2",
-    "1010": "sum3",
-    "1011": "mul2",
-    "1100": "div",
-    "1101": "div2",
-}
+# 6 bits para la operacion, 4 bits para el modo, 22 bits para las memorias
+from modes import mode
+from operations import operations
+
 #entrada salida
 es = {}
 #acumulador
@@ -119,11 +108,15 @@ def load_es_variable():
 
 #lee la instruccion y retorna la accion
 def read_action(instruction):
-    return actions[instruction[0:4]]
+    return operations[instruction[0:6]]
+#0000001111
+#lee la instruccion y retorna el modo
+def read_mode(instruction):
+   return  mode[instruction[6:10]]
 
 #lee la instruccion y retorna los registros
 def read_register(instruction):
-    return  int(instruction[4:15], 2), int(instruction[15:26], 2)
+    return  int(instruction[10:21], 2), int(instruction[21:32], 2)
 
 #ejecuta la accion
 def execute_action(action, register1, register2):
@@ -168,13 +161,20 @@ def write_register(register,valor): #guarda el valor en el registro
 #convierte el numero a binario
 def convertToBinary(num):
     return bin(num).replace("0b", "")
+# ------ Pruebas a funciones ----------
 
+
+# ins = "700/00000100011001110001010011100100"
+# data = ins.split("/")
+# print(read_action(data[1]))
+# print(read_mode(data[1]))
+# print(read_register(data[1]))
 #-------Ejecucion del programa-----------------
 f = open("./datos.txt", "r")
 #leer el archivo de datos
 for r in f :
     data = r.split("/")
-    if(len(data[1]) < 26):
+    if(len(data[1]) < 32):
         write_register(data[0], data[1])
         print(valores)
     
@@ -187,7 +187,7 @@ load_es_variable()
 for x in g:
   data = x.split("/")
 #ya no seria necesario el if en el caso en que trabajemos con archivos distintos
-  if len(data[1]) > 26 :
+  if len(data[1]) > 32 :
     accion = read_action(data[1])
     print(accion)
     register1, register2 = read_register(data[1])
