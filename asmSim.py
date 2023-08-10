@@ -9,6 +9,9 @@ ac = 0
 #registros de memoria
 valores = {}
 
+needToJump = False
+
+lineToJump = 0
 #Funciones que ejecuta el programa
 
 #1- Carga de memoria hacia AC
@@ -72,6 +75,29 @@ def div(register1):
 def div2(register1): #dividir el acumulador entre el registro se almacena en el registro2
   global ac
   return ac // register1
+
+
+def ifOp(mode, valor1):
+   match mode:
+      case "=":
+         if ac == valor1 : return True
+         return False
+      case "<":
+         if ac < valor1 : return True
+         return False
+      case ">":
+         if ac > valor1 : return True
+         return False
+      case "<=":
+         if ac <= valor1 : return True
+         return False
+      case ">=":
+         if ac >= valor1 : return True
+         return False
+      case "!=":
+         if ac != valor1: return True
+         return False
+   pass
  
 #Guardar en E/S desde AC, almacena el contenido de AC en un dispositivo de E/S
 # retorna el registro ES donde se guardó el valor
@@ -112,6 +138,7 @@ def read_action(instruction):
 #0000001111
 #lee la instruccion y retorna el modo
 def read_mode(instruction):
+   print(mode[instruction[6:10]])
    return  mode[instruction[6:10]]
 
 #lee la instruccion y retorna los registros
@@ -119,9 +146,10 @@ def read_register(instruction):
     return  int(instruction[10:21], 2), int(instruction[21:32], 2)
 
 #ejecuta la accion
-def execute_action(action, register1, register2):
+def execute_action(action, register1, register2, mode):
     valor1 = valores.get(register1)
     valor2 = valores.get(register2)
+
     match action:
       case "load":
         load(valor1)
@@ -149,6 +177,9 @@ def execute_action(action, register1, register2):
           load_from_es(register1)
       case "save2":
           load_to_es(register1)
+      case "if":
+          global needToJump
+          needToJump = ifOp(mode, valor1)
     pass
 
 #guarda el valor en el registro
@@ -165,7 +196,12 @@ def convertToBinary(num):
 
 
 # ins = "700/00000100011001110001010011100100"
+
 # data = ins.split("/")
+# print(data[1][0:6])
+# print(data[1][6:10])
+# print(data[1][10:21])
+# print(data[1][21:32])
 # print(read_action(data[1]))
 # print(read_mode(data[1]))
 # print(read_register(data[1]))
@@ -174,9 +210,8 @@ f = open("./datos.txt", "r")
 #leer el archivo de datos
 for r in f :
     data = r.split("/")
-    if(len(data[1]) < 32):
-        write_register(data[0], data[1])
-        print(valores)
+    write_register(data[0], data[1])
+    print(valores)
     
 print(valores)
 f.close()
@@ -184,14 +219,30 @@ f.close()
 #ejecutar las instrucciones
 g = open("./Instrucciones.txt", "r")
 load_es_variable()
+counter = 0
 for x in g:
+  #00011001110010000000000000
   data = x.split("/")
+  if needToJump and data[0] != lineToJump: 
+     pass
+  print(len(data[1]))
+  print(data[1][0:6])
+  print(data[1][6:10])
+  print(data[1][10:21])
+  print(data[1][21:32])
+  print(str(counter) + " CONTADOR")
+  counter+= 1
 #ya no seria necesario el if en el caso en que trabajemos con archivos distintos
-  if len(data[1]) > 32 :
-    accion = read_action(data[1])
-    print(accion)
-    register1, register2 = read_register(data[1])
-    execute_action(accion, register1, register2)
+  accion = read_action(data[1])
+  print(accion)
+  register1, register2 = read_register(data[1])
+  mode = read_mode(data[1])
+  execute_action(accion, register1, register2, mode)
+  if needToJump: 
+     lineToJump =  int(register2, 2)
+     print(lineToJump)
+  if lineToJump == data[0]: 
+     needToJump = False
 g.close()
 
 #guardar los datos en el archivo de datos asi como el de E/S
