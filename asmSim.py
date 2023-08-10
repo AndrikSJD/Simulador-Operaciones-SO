@@ -1,7 +1,15 @@
 # 6 bits para la operacion, 4 bits para el modo, 22 bits para las memorias
-from modes import mode
+# from modes import mode
 from operations import operations
 
+mode = {
+    "0000": "=",
+    "0001": ">",
+    "0010": "<",
+    "0011": ">=",
+    "0100": "<=",
+    "0101": "!=",
+}
 #entrada salida
 es = {}
 #acumulador
@@ -78,6 +86,7 @@ def div2(register1): #dividir el acumulador entre el registro se almacena en el 
 
 
 def ifOp(mode, valor1):
+   print(mode + "MODO")
    match mode:
       case "=":
          if ac == valor1 : return True
@@ -138,8 +147,9 @@ def read_action(instruction):
 #0000001111
 #lee la instruccion y retorna el modo
 def read_mode(instruction):
-   print(mode[instruction[6:10]])
-   return  mode[instruction[6:10]]
+   llave = instruction[6:10]
+   print(llave + "LAVE")
+   return mode[llave]
 
 #lee la instruccion y retorna los registros
 def read_register(instruction):
@@ -219,27 +229,20 @@ f.close()
 #ejecutar las instrucciones
 g = open("./Instrucciones.txt", "r")
 load_es_variable()
-counter = 0
 for x in g:
   #00011001110010000000000000
   data = x.split("/")
   if needToJump and data[0] != lineToJump: 
      pass
-  print(len(data[1]))
-  print(data[1][0:6])
-  print(data[1][6:10])
-  print(data[1][10:21])
-  print(data[1][21:32])
-  print(str(counter) + " CONTADOR")
-  counter+= 1
 #ya no seria necesario el if en el caso en que trabajemos con archivos distintos
   accion = read_action(data[1])
   print(accion)
   register1, register2 = read_register(data[1])
-  mode = read_mode(data[1])
-  execute_action(accion, register1, register2, mode)
+  modeRes = read_mode(data[1])
+  execute_action(accion, register1, register2, modeRes)
   if needToJump: 
-     lineToJump =  int(register2, 2)
+     print(str(register2) + "REGISTRO2")
+     lineToJump =  int(register2)
      print(lineToJump)
   if lineToJump == data[0]: 
      needToJump = False
