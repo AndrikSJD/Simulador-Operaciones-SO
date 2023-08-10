@@ -1,15 +1,8 @@
 # 6 bits para la operacion, 4 bits para el modo, 22 bits para las memorias
-# from modes import mode
+from modes import mode
 from operations import operations
 
-mode = {
-    "0000": "=",
-    "0001": ">",
-    "0010": "<",
-    "0011": ">=",
-    "0100": "<=",
-    "0101": "!=",
-}
+
 #entrada salida
 es = {}
 #acumulador
