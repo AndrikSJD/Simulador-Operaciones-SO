@@ -148,7 +148,6 @@ def read_action(instruction):
 #lee la instruccion y retorna el modo
 def read_mode(instruction):
    llave = instruction[6:10]
-   print(llave + "LAVE")
    return mode[llave]
 
 #lee la instruccion y retorna los registros
@@ -233,19 +232,21 @@ for x in g:
   #00011001110010000000000000
   data = x.split("/")
   if needToJump and data[0] != lineToJump: 
+     print("Linea actual:" + str(data[0]) +" : Linea destino: "+str(lineToJump))
+     print("Saltando Linea...")
      pass
+  else:
 #ya no seria necesario el if en el caso en que trabajemos con archivos distintos
-  accion = read_action(data[1])
-  print(accion)
-  register1, register2 = read_register(data[1])
-  modeRes = read_mode(data[1])
-  execute_action(accion, register1, register2, modeRes)
-  if needToJump: 
-     print(str(register2) + "REGISTRO2")
-     lineToJump =  int(register2)
-     print(lineToJump)
-  if lineToJump == data[0]: 
-     needToJump = False
+    accion = read_action(data[1])
+    print(accion)
+    register1, register2 = read_register(data[1])
+    modeRes = read_mode(data[1])
+    execute_action(accion, register1, register2, modeRes)
+    if needToJump : 
+      lineToJump =  int(register2)
+    if lineToJump == data[0]: 
+      needToJump = False
+      
 g.close()
 
 #guardar los datos en el archivo de datos asi como el de E/S
